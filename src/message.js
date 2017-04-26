@@ -4,6 +4,7 @@
  */
 
 const recastai = require('recastai')
+const slackify = require('slackify-html');
 const axios = require('axios')
 const axios_client = axios.create({
   baseURL: 'https://api.stackexchange.com/2.2/',
@@ -54,11 +55,11 @@ const replyMessage = (message) => {
 
             if (answers.length > 0) {
               message.addReply({ type: 'text', content: 'Here are the best answers from stack overflow:' })
-              message.addReply({ type: 'text', content: answers[0].body })
-              message.addReply({ type: 'text', content: answers[1].body })
-              message.addReply({ type: 'text', content: answers[2].body })
-              message.addReply({ type: 'text', content: answers[3].body })
-              message.addReply({ type: 'text', content: answers[4].body })
+              message.addReply({ type: 'text', content: slackify(answers[0].body) })
+              message.addReply({ type: 'text', content: slackify(answers[1].body) })
+              message.addReply({ type: 'text', content: slackify(answers[2].body) })
+              message.addReply({ type: 'text', content: slackify(answers[3].body) })
+              message.addReply({ type: 'text', content: slackify(answers[4].body) })
             } else {
               message.addReply({ type: 'text', content: 'No answer found on stack overflow for your question' })
             }
