@@ -4,6 +4,14 @@
  */
 
 const recastai = require('recastai')
+const axios = require('axios')
+const axios_client = axios.create({
+  baseURL: 'https://api.stackexchange.com/2.2/',
+  params: {
+    site: 'stackoverflow',
+    order: 'desc'
+  }
+})
 
 // This function is the core of the bot behaviour
 const replyMessage = (message) => {
@@ -20,33 +28,66 @@ const replyMessage = (message) => {
   // Call Recast.AI SDK, through /converse route
   request.converseText(text, { conversationToken: senderId })
   .then(result => {
-    /*
-    * YOUR OWN CODE
-    * Here, you can add your own process.
-    * Ex: You can call any external API
-    * Or: Update your mongo DB
-    * etc...
-    */
+
     if (result.action) {
       console.log('The conversation action is: ', result.action.slug)
     }
 
-    // If there is not any message return by Recast.AI for this current conversation
-    if (!result.replies.length) {
-      message.addReply({ type: 'text', content: 'I don\'t have the reply to this yet :)' })
-    } else {
-      // Add each reply received from API to replies stack
-      result.replies.forEach(replyContent => message.addReply({ type: 'text', content: replyContent }))
-    }
+    if (result.intents[0].slug == 'so-question') {
+        console.log('Sending question "' + result.source + '" to stack overflow')
 
-    // Send all replies
-    message.reply()
-    .then(() => {
-      // Do some code after sending messages
-    })
-    .catch(err => {
-      console.error('Error while sending message to channel', err)
-    })
+        var answer_ids = []
+        var answers = []
+        axios_client.get('search/advanced?sort=relevance&q=' + result.source)
+        .then(response => {
+          response.data.items.forEach(item => {
+            if (item.accepted_answer_id) {
+              answer_ids.push(item.accepted_answer_id);
+            }
+          })
+
+          axios_client.get('answers/' + answer_ids.join(';') + '?filter=!bJDus)cXjL7zo1')
+          .then(response => {
+            answer_ids.forEach(id => {
+              answers.push(response.data.items.filter(item => { return item.answer_id == id })[0])
+            })
+
+            if (answers.length > 0) {
+              message.addReply({ type: 'text', content: 'Here are the best answers from stack overflow:' })
+              message.addReply({ type: 'text', content: answers[0].body })
+            } else {
+              message.addReply({ type: 'text', content: 'No answer found on stack overflow for your question' })
+            }
+
+            // FIXME: duplicated
+            message.reply()
+            .then(() => {
+              // Do some code after sending messages
+            })
+            .catch(err => {
+              console.error('Error while sending message to channel', err)
+            })
+          })
+        })
+
+    } else {
+      // If there is not any message return by Recast.AI for this current conversation
+      if (!result.replies.length) {
+        message.addReply({ type: 'text', content: 'I don\'t have the reply to this yet :)' })
+      } else {
+        // Add each reply received from API to replies stack
+        result.replies.forEach(replyContent => message.addReply({ type: 'text', content: replyContent }))
+      }
+
+      // Send all replies
+      message.reply()
+      .then(() => {
+        // Do some code after sending messages
+      })
+      .catch(err => {
+        console.error('Error while sending message to channel', err)
+      })
+    }
   })
   .catch(err => {
     console.error('Error while sending message to Recast.AI', err)
