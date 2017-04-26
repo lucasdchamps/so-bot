@@ -55,6 +55,10 @@ const replyMessage = (message) => {
             if (answers.length > 0) {
               message.addReply({ type: 'text', content: 'Here are the best answers from stack overflow:' })
               message.addReply({ type: 'text', content: answers[0].body })
+              message.addReply({ type: 'text', content: answers[1].body })
+              message.addReply({ type: 'text', content: answers[2].body })
+              message.addReply({ type: 'text', content: answers[3].body })
+              message.addReply({ type: 'text', content: answers[4].body })
             } else {
               message.addReply({ type: 'text', content: 'No answer found on stack overflow for your question' })
             }
