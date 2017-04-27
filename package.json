@@ -21,7 +21,7 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "recastai": "^3.1.1",
-    "slackify-html": "^1.0.1"
+    "slackify-html": "github:lucasdchamps/slackify-html"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",
