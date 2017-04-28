@@ -55,11 +55,11 @@ const replyMessage = (message) => {
 
             if (answers.length > 0) {
               message.addReply({ type: 'text', content: 'Here are the best answers from stack overflow:' })
-              message.addReply({ type: 'text', content: slackify(answers[0].body) })
-              message.addReply({ type: 'text', content: slackify(answers[1].body) })
-              message.addReply({ type: 'text', content: slackify(answers[2].body) })
-              message.addReply({ type: 'text', content: slackify(answers[3].body) })
-              message.addReply({ type: 'text', content: slackify(answers[4].body) })
+
+              var i = 0
+              while (i < 5 && i < answers.length) {
+                message.addReply({ type: 'text', content: slackify(answers[i].body) })
+              }
             } else {
               message.addReply({ type: 'text', content: 'No answer found on stack overflow for your question' })
             }
