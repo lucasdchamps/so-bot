@@ -59,6 +59,7 @@ const replyMessage = (message) => {
               var i = 0
               while (i < 5 && i < answers.length) {
                 message.addReply({ type: 'text', content: slackify(answers[i].body) })
+                i += 1
               }
             } else {
               message.addReply({ type: 'text', content: 'No answer found on stack overflow for your question' })
